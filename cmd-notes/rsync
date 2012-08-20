@@ -1,0 +1,2 @@
+rsync -avhP --delete /limdata/limih $LIMIHBASE
+rsync -avhP --delete /limdata/limih $LIMIHBASE

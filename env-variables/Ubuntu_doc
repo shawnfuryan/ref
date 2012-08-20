@@ -1,0 +1,401 @@
+src: https://help.ubuntu.com/community/EnvironmentVariables
+retrieved 2012.06.14
+Current to Ubuntu version 12.04
+
+###########################################################
+###
+###  EnvironmentVariables
+###
+###########################################################
+
+
+###  Table of Contents
+
+  Introduction
+  Manipulating environment variables and values
+    Setting values to environment variables
+    Examining values of environment variables
+    Erasing environment variables
+  Working principles of environment variables
+    Process locality
+    Inheritance
+    Case sensitivity
+  Bash's quick assignment and inheritance trick
+  Persistent environment variables
+    Session-wide environment variables
+    System-wide environment variables
+    Launching desktop application with an environment variable
+  List of common environment variables
+    File-location related variables
+    Locale setting variables
+    Preferred application variables
+    Graphical desktop-related variables
+    Gnome-specific variables
+    Program execution variables
+    Compilation and software development related variables
+    Other environment variables
+
+###  Introduction
+Environment variables provide a way to influence the behaviour of software on the system. For example, the "LANG" environment variable determines the language in which software programs communicate with the user.
+
+Environment variables consist of names that have values assigned to them. For example, on a typical system in the US we would have the value "en_US.UTF-8" assigned to the "LANG" variable.
+
+The meaning of an environment variable and the format of its value are determined by the application using it. There are quite a few well-known environment variables for which the meaning and the format have been agreed upon and they are used by many applications.
+
+
+###  Manipulating environment variables and values
+While quite a few graphical system configuration applications actually manipulate environment variables in the background, the command-line allows for maximum flexibility when manipulating environment variables.
+
+Note: The shell techniques explained in the following sections apply to the Bourne Shell family of command line shells, which includes sh, ksh, and bash, which is the default shell shipped with Ubuntu. The commands may be different on other shells such as csh.
+
+
+###  Setting values to environment variables
+In order to set a value to an existing environment variable, we use an assignment expression. For instance, to set the value of the "LANG" variable to "he_IL.UTF-8", we use the following command:
+   #-> LANG=he_IL.UTF-8
+If we use an assignment expression for a variable that doesn't exist, the shell will create a shell variable, which is similar to an environment variable but does not influence the behaviour of other applications.
+
+A shell variable can be exported to become an environment variable with the export command To create the "EDITOR" environment variable and assign the value "nano" to it. 
+
+There are several ways to accomplish this. However, we will use the following formats:
+   | EDITOR=nano
+   | export EDITOR
+The bash shell (the default command-line shell in Ubuntu) provides a shortcut for creating environment variables. The previous example could be performed with the following single command:
+   #-> export EDITOR=nano
+
+
+###  Examining values of environment variables
+The printenv command prints the names and values of all currently defined environment variables:
+   #-> printenv 
+To examine the value of a particular variable, we can specify its name to the printenv command:
+   #-> printenv TERM
+Another way to achieve that is to use the dollar sign ($), as used in the following example:
+   #-> echo $TERM
+There is a command for doing temporary, short-term changes to the environment. It can also be used to display the current environment. This command is env.
+   #-> env
+The dollar sign can actually be used to combine the values of environment variables in many shell commands. For example, the following command can be used to list the contents of the "Desktop" directory within the current user's home directory.
+   #-> ls $HOME/Desktop
+
+
+###  Erasing environment variables
+While simply setting an empty value to an environment variable, as shown in the example below, may nullify its effect in most cases, there are a few variables such as "POSIXLY_CORRECT" whose mere existence, even with an empty value, influences the behavior of programs.
+   | export LC_ALL=
+The unset command can be used in order to completely erase the existence of an environment variable:
+   #-> unset LC_ALL
+It is also possible to use the "-n" switch to the export command in order un-export an environment variable and therefore demote it to become a shell variable while preserving its value.
+
+   #-> export -n LC_ALL
+
+
+###  Working principles of environment variables
+A few simple principles govern how environment variables work and achieve their effect.
+
+#Process locality
+The values of environment variables are local, which means they are specific to the running process in or for which they were set. This means that if we open two terminal windows (which means we have two separate bash processes running), and change a value of an environment variable in one of the windows, that change will not be seen by the shell in the other window or any other program currently on the desktop.
+
+#Inheritance
+When a parent process creates a child process, for example when we run the "gedit" command from the terminal and "bash" (the parent process) creates "gedit" (the child process), the child process inherits all the environment variables and values the parent process had.
+
+This means that if we set a new value to the "LANG" environment variable in the terminal, and then run "gedit" from that same terminal, "gedit" will inherit the new value of "LANG", and therefore may display in a different language than the rest of the processes on the desktop.
+
+Note that because of the Process Locality principle explained above, once we run Gedit, changes to environment variables of the parent process will not be seen by the child process and vice-versa.
+
+Note: in the Gnome graphical desktop environment, gnome-session is the parent process of all the processes running on the desktop. This fact (along with the Inheritance principle) is the key to our ability to powerfully influence the operation of our desktop with environment variables. The equivalent process in KDE is kde-session.
+
+#Case sensitivity
+The names of environment variables are case sensitive. This means that lang is not the same variable as LANG, Lang, or laNg.
+
+It is a common practice to name all environment variables with only English capital letters and underscore (_) signs.
+
+
+###  Bash's quick assignment and inheritance trick
+The bash shell has a trick to allow us to set one or more environment variables and run a child process with single command. For example, in order to set the "LANG" and "FOO" environment variables and then run "gedit", we would use the following command:
+   #-> LANG=he_IL.UTF-8 FOO=bar gedit
+Note: When using this command, the new values are only assigned to the environment variables of the child process (in this case gedit). The variables of the shell retain their original values. For instance, in the example above, the value of "LANG" will not change from its original value, as far as subsequent commands to the shell are concerned.
+
+A similar behaviour can be achieved with other shells by using the env command.
+
+
+###  Persistent environment variables
+So far we've only discussed ways set an environment variable value temporarily until the shell session in which it was set is closed. One may wonder if there is a way to somehow permanently set an environment variable to a certain value.
+
+Note: The shell config files mentioned below are only meant to be read by particular shells and desktop environments and should not be used.
+
+#Session-wide environment variables
+Environment variable settings that should affect just a particular user (rather then the system as a whole) should be set into:
+
+~/.pam_environment - This file is specifically meant for setting a user's environment. It is not a script file, but rather consists of assignment expressions, one per line.
+
+Note: Using .pam_environment requires a re-login in order to initialize the variables. Restarting just the terminal is not sufficient to be able to use the variables.
+
+If you are using KDE, see the KDE User-base page on this topic.[link:http://userbase.kde.org/Session_Environment_Variables/en]
+
+Not recommended:
+
+  1. ~/.profile - This is probably the best file for placing environment variable assignments, since it gets executed automatically by the DisplayManager during the start-up process desktop session as well as by the login shell when one logs-in from the textual console.
+
+  2. ~/.bash_profile or ~./bash_login - If one of these file exist, bash executes it rather then "~/.profile" when it is started as a login shell. (Bash will prefer "~/.bash_profile" to "~/.bash_login"). However, these files won't influence a graphical session by default.
+
+  3. ~/.bashrc - Because of the way Ubuntu currently sets up the various script files by default, this may be the easiest place to set variables in. The default configuration nearly guarantees that this file will be executed in each and every invocation of bash as well as while logging in to the graphical environment. The performance cost of this will be negligible; the overhead of forking and execing bash will massively dominate the small cost of setting a handful of variables.
+
+
+###  System-wide environment variables
+Environment variable settings that affect the system as a whole (rather then just a particular user) should not be placed in any of the many system-level scripts that get executed when the system or the desktop session are loaded, but into
+
+  1. /etc/environment - This file is specifically meant for system-wide environment variable settings. It is not a script file, but rather consists of assignment expressions, one per line. Specifically, this file stores the system-wide locale and path settings.
+
+Not recommended:
+
+  1. /etc/profile - This file gets executed whenever a bash login shell is entered (e.g. when logging in from the console or over ssh), as well as by the DisplayManager when the desktop session loads. This is probably the file you will get referred to when asking veteran UNIX system administrators about environment variables. In Ubuntu, however, this file does little more then invoke the /etc/bash.bashrc file.
+
+  2. /etc/bash.bashrc - This is the system-wide version of the ~/.bashrc file. Ubuntu is configured by default to execute this file whenever a user enters a shell or the desktop environment.
+
+Note: When dealing with end-user/home desktop systems may be appropriate to place settings in the user's ~/.pam_environment files discussed above rather then the system-wide ones, since those files do not require one to utilize root privileges in order to edit and are easily moved between systems.
+
+
+###  Launching desktop application with an environment variable
+You can add an environment variable to an application by editing its .desktop file. For example, to run "digiKam" with the environment variable APPMENU_DISPLAY_BOTH=1, find the corresponding digikam.desktop file and add the setting of the variable, via the env command, to the entry "Exec":
+   | Exec=env APPMENU_DISPLAY_BOTH=1 digikam -caption "%c" %i
+
+
+###  List of common environment variables
+Each application is free to define and use its own environment variables. Many manual pages include long lists of environment variables that can affect the behaviour of the application they describe. However, the most useful variables are common to many applications.
+
+#File-location related variables
+The following variables determine how the system locates various files in order to operate.
+
+PATH
+  -Value Examples: /usr/sbin:/usr/bin:/sbin:/bin
+  -What it's for: When you type a command to run, the system looks for it in the directories specified by PATH in the order specified
+
+MANPATH
+  -Value Examples: /usr/share/man:/usr/local/man
+  -What it's for: List of directories for the system to search manual pages in
+
+LD_LIBRARY_PATH
+  -Value Examples: /opt/app/oracle/lib
+  -What it's for: List of directories where the system searches for runtime libraries in addition to those hard-defined by ld and in /etc/ld.so.conf.d/*.conf files. Note: You can only set this environment variable inside an interactive shell. Since Ubuntu 9.04 Jaunty Jackalope, LD_LIBRARY_PATH cannot be set in $HOME/.profile, /etc/profile, nor /etc/environment files. You must use /etc/ld.so.conf.d/*.conf configuration files. See Launchpad bug #366728 for more information.
+
+TMPDIR
+  -Value Examples: /var/tmp
+  -What it's for: The directory used for temporary file creation by several programs
+
+
+###  Locale setting variables
+The following environment variables determine the locale-related behaviour of the systems such as the language of messages sent to the user and the way times and dates are presented.
+
+The values that can assigned to the locale environment variables are names of locale setting packages installed on the system. To see which such packages are installed on the system, one can use the locale -a command. Locale setting packages can be generated with the locale-gen command. However, Ubuntu includes pre-generated locale setting packages in the language-pack packages available within the package management system.
+
+LANG
+The basic language setting used by applications on the system, unless overridden by one of the other locale environment variables
+
+LC_CTYPE
+The character set used to display and input text
+
+LC_NUMERIC
+How non-monetary numeric values are formatted on screen
+
+LC_TIME
+How date and time values are formatted
+
+LC_COLLATE
+How to sort various information items (e.g. defines the order of the alphabet so items can be ordered alphabetically by the sort command)
+
+LC_MONETARY
+How monetary numeric values are formatted
+
+LC_MESSAGES
+Which language is to display messages to the end user
+
+LC_PAPER
+Definitions of paper formats and standards
+
+LC_NAME
+How names are formatted
+
+LC_ADDRESS
+How to display address information
+
+LC_TELEPHONE
+How telephone numbers are structured
+
+LC_MEASUREMENT
+What units of measurement are used
+
+LC_IDENTIFICATION
+
+LC_ALL
+This variable serves as a powerful override over all the other locale environment variables. When its value is set, applications use that value to determine which locale settings to use regardless of the values of the other variables
+
+By utilizing various combinations of settings for the locale variables, you can make interesting tweaks to the behaviour of your system. For example, you can make your system display message in US-English while using number, date, and measurement formats that are more common to European countries.
+
+The locale variables can effectively override each other's value in some combinations. Therefore examining the values of the variables themselves may not always provide clear indication of how the system will behave. The locale command can be used to examine what the effective values are to the applications.
+
+
+###  Preferred application variables
+These environment variables indicate to various programs what the user's preferred applications are for performing certain tasks.
+
+These variables are typically not respected by GUI applications that tend to include their own built-in text display windows and editors. Most desktop environments also contain their own preferred application selection system.
+
+PAGER
+/usr/bin/less
+The name of the utility used to display long text by commands such as man.
+
+EDITOR
+/usr/bin/nano
+The name of the user's preferred text editor. Used by programs such as the mutt mail client and sudoedit.
+
+VISUAL
+/usr/bin/gedit
+Similar to the "EDITOR" environment variable, applications typically try the value in this variable first before falling back to "EDITOR" if it isn't set.
+
+BROWSER
+/usr/bin/lynx
+The name of the user's preferred web browser. This variable is arguably less common than the rest
+
+
+###  Graphical desktop-related variables
+DISPLAY
+:0.0
+localhost:10.0
+terminal01:0.0
+This variable is used to indicate to graphical applications where to display the actual graphical user interface, the value consists of 3 parts: A host-name followed by a colon (:), a display number followed by a dot (.) and a screen number. The host-name part can be used to have the graphical output sent to a remote machine over the network. It can be omitted when the output is meant for an X server running on the local machine. The display number allows selecting among multiple X servers running on the same machine (Ubuntu uses multiple X servers to enable multiple graphical desktop sessions). Although the screen number is used to select among multiple physical screen that are managed by the same X server, it is rarely set to anything other then "0" nowadays. Manually setting the "DISPLAY" environment variable's value is rarely needed nowadays since it can be automatically and intelligently adjusted by many applications such as "GDM" and "SSH" when needed.
+
+XDG_DATA_HOME
+~/.local/share
+Indicates to applications that conform to the freedesktop.org specifications, where to place the user's private data. This variable is typically unset since a sensible default fall-back value was defined by the specifications.
+
+XDG_CONFIG_HOME
+~/.config
+Indicates to applications that conform to the freedesktop.org specifications, where to place the user's configuration information. This variable is typically unset since a sensible default fall-back value was defined by the specifications.
+
+XDG_DATA_DIRS
+/usr/local/share:/usr/share
+A colon-separated list (similar to "PATH") of directories where data is searched for by applications that conform to the freedesktop.org specifications. This variable is typically unset since a sensible default fall-back value was defined by the specifications.
+
+XDG_CONFIG_DIRS
+/etc/xdg
+A colon-separated list (similar to "PATH") of directories where configuration information is searched for by applications that conform to the freedesktop.org specifications. This variable is typically unset since a sensible default fall-back value was defined by the specifications.
+
+XDG_CACHE_HOME
+~/.cache
+A location used by applications that conform to the freedesktop.org specifications to cache temporary data. This variable is typically unset since a sensible default fall-back value was defined by the specifications.
+
+#Gnome-specific variables
+NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+/home/ifireball/about.html
+This environment variable is set by Nautilus, the Gnome file manager, to a newline-delimited list of the currently selected files, when a script is invoked from the right-click menu. This variable is only set if the files are local, e.g. not from a network share or an SSH connection
+
+NAUTILUS_SCRIPT_SELECTED_URIS
+file:///home/ifireball/about.html
+This environment variable is set by Nautilus to a newline-delimited list of the URI addresses of the currently selected files, when a script is invoked from the right-click menu.
+
+NAUTILUS_SCRIPT_CURRENT_URI
+file:///home/ifireball
+This environment variable is set to the URI address of the location currently displayed by the Nautilus window, when a script is invoked from the right-click menu.
+
+NAUTILUS_SCRIPT_WINDOW_GEOMETRY
+828x511+251+342
+This environment variable is set to the on-screen position of the Nautilus window, when a script is invoked from the right-click menu.
+
+
+###  Program execution variables
+Arguably the most powerful (but dangerous) environment variables, the following allow tweaking the basic way software actually runs.
+
+LD_PRELOAD
+/usr/lib/valgrind.so
+This variable can be used to inject a custom dynamic library into an application's memory when it loads. It can be used to do things like replacing the application's built-in memory allocation library with a debugging version in order to detect memory leaks. It can also be used to override the way it does various things like play sounds.
+
+
+###  Compilation and software development related variables
+
+CC
+gcc
+The name of the C compiler to use
+
+CXX
+g++
+The name of the C++ compiler to use
+
+CFLAGS
+-o out.o
+A list of debugging/optimization flags to pass to the C compiler
+
+CXXFLAGS
+-Wall
+A list of debugging/optimization flags to pass to the C++ compiler
+
+CPPFLAGS
+-DDEBUG
+A list of flags to pass to the C/C++ pre-processor/compiler
+
+LIBRARY_PATH
+/usr/lib/firefox
+A list of directories (separated by colons) in which library files should be searched for
+
+INCLUDE
+/opt/app/src/include
+A colon-separated list of directories in which header files should be searched for
+
+CPATH
+..:$HOME/include:/usr/local/include
+A colon-separated list of directories in which header files should be searched for
+
+
+###  Other environment variables
+
+USER
+myuser1
+The name of the currently logged-in user. This variable is set by the system. You probably shouldn't change its value manually.
+
+LOGNAME
+myuser1
+Similar to "USER", some programs prefer to read this variable rather than USER.
+
+HOME
+/home/myuser1
+The location of the currently logged-in user's home directory.
+
+PWD
+/home/myuser1/Desktop
+The current working directory of the shell.
+
+SHELL
+/bin/bash
+The user's preferred command-line shell as it is set in the /etc/passwd file.
+
+POSIXLY_CORRECT
+N/A
+If this environment variable exists, regardless of its value, it causes the behaviour of quite a few utilities to more closely match the behaviour defined by the POSIX standard. This typically makes various GNU extensions that make life easier not work, but it may just be what's needed to make an old UNIX script execute successfully.
+
+HOSTALIASES
+/etc/host.aliases
+The name of a file containing host-name aliases for use with various network programs.
+
+TZDIR
+/usr/share/zoneinfo
+The path of the directory containing time-zone information files. This typically does not need to be set manually, as the system searches for such files in /usr/share/zoneinfo by default.
+
+TZ
+IST-2
+:Japan
+This variable was used by older UNIX systems to specify the system's time-zone. However, Ubuntu and most other modern systems use the /etc/localtime file for that purpose. This variable can, however, be used to make one user's particular session display times in a different time-zone than the rest of the system.
+The value of this variable can either be the name and offset of a time-zone (as seen in the first example) or the name of a zone-info file in /usr/share/zoneinfo (as seen in the second example).
+
+TERM
+xterm
+The name of a terminal information file from /lib/terminfo, this file instructs terminal programs how to achieve things such as displaying color. It may help to fiddle with this variable if you're trying use an odd terminal emulator program or trying to connect a hardware serial-port terminal emulator and getting undesired results.
+
+TERMCAP
+This variable can be used instead of "TERM" to manually specify terminal information rather than point to a file.
+
+COLUMNS
+80
+The number of text columns in the terminal window. Try adjusting this variable if lines don't seem to wrap properly in the console.
+
+LINES
+25
+The number of text lines on the console window. Try adjusting this variable if you're getting strange results when scrolling text.
+
+SDL_VIDEO_FULLSCREEN_DISPLAY
+0
+In multiple monitor setups, such as Xinerama or TwinView, this sets which screen to use for full-screen mode for SDL applications/games. If unset all screens are used.

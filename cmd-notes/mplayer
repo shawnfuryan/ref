@@ -1,0 +1,4 @@
+# Play an audio cd in terminal via mplayer
+mplayer -cdrom-device /dev/sr0 cdda://1-15
+# ~~ /dev/sr0 --> system device name for cdrom
+# ~~ cdda://1-15 --> play tracks 1-15

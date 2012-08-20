@@ -1,0 +1,17 @@
+Backup DB:
+mysqldump -u limih -p0}y3V7SJEi limih_ws_db > /limdata/mysql_dump_test/limih_ws_db.sql
+
+Drop DB:
+mysql -uroot -plimXmim -e "DROP DATABASE limih_ws_db;"
+
+Reload DB:
+/limdata/limih/mimTools/adminbin/setup_ws_mysql.sh
+
+Restore a database:
+mysql -h localhost -u limih -p0}y3V7SJEi limih_ws_db < /limdata/mysql_dump_test/limih_ws_db.sql
+
+
+[From setup_ws_mysql.sh] Create limih user on mysql:
+mysql -h localhost -uroot -plimXmim limih_ws_db -e "create user 'limih'@'localhost' identified by '0}y3V7SJEi';"
+Grant Permissions to limih:
+mysql -h localhost -uroot -plimXmim limih_ws_db -e "grant all on limih_ws_db.* to 'limih'@'localhost';"

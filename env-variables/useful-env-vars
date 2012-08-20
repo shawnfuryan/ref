@@ -1,0 +1,14 @@
+USER
+The name of the currently logged-in user.
+
+LOGNAME
+Similar to "USER", some programs prefer to read this variable rather than USER.
+
+HOME
+The location of the currently logged-in user's home directory.
+
+PWD
+The current working directory of the shell.
+
+SHELL
+The user's preferred command-line shell as it is set in the /etc/passwd file.
