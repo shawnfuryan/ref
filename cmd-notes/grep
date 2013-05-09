@@ -1,1 +1,6 @@
+grep -i pattern     # case insensitive search
 grep -v pattern     # find lines that don't contain pattern
+
+egrep ( grep -E ) -- grep extended, recognizes more regex metachars, incl'g +, ?, | and ()
+fgrep ( grep -F ) -- fixed/fast grep. doesn't understand regex, but is faster for simple patterns
+grep -P -- experimental PCRE
