@@ -1,0 +1,8 @@
+Git
+
+git add [-A] . -- Stage all new/altered files from current directory and all children recursively
+git commit -m 'COMMIT_MESSAGE' -- commit staged changes to the repo
+git checkout -b BRANCH_NAME -- create a new branch called BRANCH_NAME
+git checkout BRANCH_NAME -- switch working tree to BRANCH_NAME
+git log -- show commit summaries in reverse cronological order
+git merge BRANCH_NAME -- merge changes from BRANCH_NAME into current branch
