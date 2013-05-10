@@ -1,10 +1,20 @@
 Git
 
-git add [-A] . -- Stage all new/altered files from current directory and all children recursively
-git commit -m 'COMMIT_MESSAGE' -- commit staged changes to the repo
-git checkout -b BRANCH_NAME -- create a new branch called BRANCH_NAME
-git checkout BRANCH_NAME -- switch working tree to BRANCH_NAME
-git log -- show commit summaries in reverse cronological order
-git merge BRANCH_NAME -- merge changes from BRANCH_NAME into current branch
-git remote [-v] -- show remote servers configured for this repo (-v displays url)
+# Local commands
+git add [-A] .  -- Stage all new/altered files from current directory and all children recursively
+git commit -m 'COMMIT_MESSAGE'  -- commit staged changes to the repo
+git checkout BRANCH_NAME  -- switch working tree to BRANCH_NAME
+git checkout -b BRANCH_NAME  -- create a new branch called BRANCH_NAME
+git merge BRANCH_NAME  -- merge changes from BRANCH_NAME into current branch
+git branch -d BRANCH_NAME  -- deletes BRANCH_NAME if all changes have been synced w/ master
+git log  -- show commit summaries in reverse cronological order
 
+# Working with Remote Repos
+git remote [-v]  -- show remote servers configured for this repo (-v displays url)
+git remote show origin  -- show various attributes of local/remote relationship
+git branch  --set-upstream-to=origin/master  -- sets current local branch to track origin/master
+git fetch origin  -- download unsynced changes to origin so they can be manually merged into local master
+git pull origin master  -- same as above, but merge started automatically
+git push origin master  -- after fetch&merge or pull, push changes to remote origin
+git remote rm SHORT_NAME  -- removes remote reference SHORT_NAME
+git push origin :BRANCH_NAME  -- deletes BRANCH_NAME on the remote repo
