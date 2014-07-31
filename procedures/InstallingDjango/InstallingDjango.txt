@@ -1,0 +1,134 @@
+
+
+
+# Hi. Welcome to this TTYRec session. In this installment,
+# We'll be installing Django.
+
+# Assuming you are using ipbt to play back this TTYRec
+# session, remember that you can switch between paused and
+# played states with the 'p' button. You can skip backward
+# one frame with the 'b' button. You can skip forward one
+# frame by pressing the spacebar. Both 'b' and the
+# spacebar can be preceded by a number to skip multiple
+# frames, for example [ 5 b ] skips back 5 frames
+
+# login to server
+ssh shawn@django-test01
+pwd   # /usr/home/shawn
+
+# Update Software
+sudo apt-get update && sudo apt-get upgrade
+
+# Install prerequisite software
+sudo apt-get install git
+which python
+# We want version 2.7.x, not 3.x.x
+
+# We are going to have a dedicated django unix user to
+# run our django app. If one doesn't yet exist on this
+# machine, feel free to create one. Just a normal linux
+# user with a home directory. 'django', or an application
+# specific name would be appropriate user names. Check
+# the manual page (or google) for adduser [ > man adduser ]
+# if you need a refresher. If you're completely
+# uncomfortable doing this, then ask for help.
+# Assuming the django user is already set up,
+# Switch to the django user
+sudo su - django
+
+# Make sure you're in something like /home/django, never
+# make assumptions with user accounts you aren't familiar
+# with since it's possible to create a user account without
+# a home directory
+pwd
+
+# If the django user isn't set up, user adduser to do it
+# Make sure that your django user ends up with a home
+# directory and with a suitable default shell, like bash
+sudo adduser django
+
+# Change to the django user
+sudo su - django
+
+# Download Dotfiles
+
+git clone https://github.com/shawnfuryan/.dotfiles.git
+# Make sure to read the README and look through the files
+# Contained in the directory. Think of the files in this
+# Directory as an extension of your ~/.bashrc. They load
+# certain variables into your shell environment, especially
+# sensitive data like api keys or site-wide administator
+# passwords. It also gives a nice little place to set
+# customazations to our environment, which will be necessary
+# for using virtualenvwrapper.
+
+cd ~/.dotfiles
+cat virtualenvwrapper
+cat load_secrets
+cd secrets
+cat django
+
+cd ~
+echo "source $HOME/.dotfiles/virtualenvwrapper" >> ~/.bashrc
+echo "source $HOME/.dotfiles/load_secrets" >> ~/.bashrc
+# That's all we really need to do, but I'm going to go
+# improve the formatting to make it look marginally less scary
+vim ~/.bashrc
+
+# Install VirtualEnvWrapper
+# This let's us install conflicting versions of Python libraries
+# on the same system in case we ever have projects that require
+# 2 versions of the same library. When this need arises, you
+# put the two projects into containers called VirtualEnvs or
+# Virtual Environments. These use a system python interpreter
+# (this is why it's important that we checked the Python
+# version in the beginning of our session). But for other 
+# libraries, like django or matplotlib, it maintains a separate
+# site-packages directory (where the libraries are stored) for
+# each VirtualEnv. We also want to avoid installing python
+# libraries to the system's default site-packages through 
+# apt-get or similar tools. When we need libraries for a project
+# to be installed, the correct procedure is to load the 
+# VirtualEnv for the project [ > workon project_name ], and then
+# use [ > pip install name_of_library_dependency ] to install
+# the library so that it's only available to the project that
+# needs it.
+
+# You'll need to temporarily change back to a user with root
+# or sudo privilages.
+exit
+sudo apt-get install virtualenvwrapper
+
+# Change back to the django user
+sudo su - django
+
+# Then create a VirtualEnv for our project, "e2www" in this case
+mkvirtualenv e2www
+
+# Activate e2www's VirtualEnv
+workon e2www
+
+# Check to see if it put us in the right place
+# We want to be working from ~/Projects/Python/
+pwd
+# If we didn't end up in the right place, go ahead
+# and got there manually. If you installed .dotfiles correctly
+# and sourced the files properly from your .bashrc, then this 
+# directory should already exist.
+cd ~/Projects/Python
+
+# Since we are in our e2www virtual environment, we can safely
+# install things that we'll need for our application. For now
+# let's just install django, and leave the rest for another
+# session. Recall that the tool that we use to install our
+# python dependencies/libraries/packages (what have you?) is
+# pip
+pip install django
+
+# Now we have our environment set up for our new django app.
+# There's still plenty more to do, but we'll save that for
+# sessions to come.
+
+# For now, let's leave our VirtualEnv, and log off of the
+# server.
+deactivate
