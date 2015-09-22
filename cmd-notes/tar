@@ -5,6 +5,3 @@ tar -[z]tvf file.tar.gz         # List Contents of file.tar[.gz]
 #Solaris Version
 tar -pczf name_of_your_archive.tar.gz /path/to/directory
 tar c source_dir | gzip -[1-9] | dest.tgz
-
-#Solaris AUSLD04
-tar cf dest.tar source_dir
